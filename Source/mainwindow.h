@@ -37,6 +37,8 @@ private:
 
     Highlighter *highlighter;
 
+    QString currentFile;
+
 private slots:
     void NewFile();
     void OpenFile();

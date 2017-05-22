@@ -16,6 +16,8 @@ MainWindow::MainWindow(QWidget *parent) :
     CreateActions();
     CreateMenus();
 
+    MainWindow::setWindowTitle("Untitled - PawnX");
+
     QFont font;
     font.setFamily("Courier");
     font.setStyleHint(QFont::Monospace);
@@ -75,6 +77,7 @@ void MainWindow::NewFile()
         statusMessage = tr("Created a new script with Template");
     }
     else statusMessage = tr("Created a new script");
+    MainWindow::setWindowTitle("Untitled - PawnX");
     statusBar()->showMessage(statusMessage);
 }
 
@@ -85,6 +88,7 @@ void MainWindow::OpenFile()
     if (!fileName.isEmpty())
     {
         QFile file(fileName);
+        QFileInfo fileInfo(fileName);
 
         if (!file.open(QIODevice::ReadOnly))
         {
@@ -96,6 +100,10 @@ void MainWindow::OpenFile()
             QTextStream in(&file);
             //ui->textEdit->setPlainText(in.readAll());
             ui->textEdit->setPlainText(in.readAll());
+
+            currentFile = fileInfo.completeBaseName();
+
+            MainWindow::setWindowTitle(currentFile + " - PawnX");
             statusMessage = tr("Opened file");
             file.close();
         }
