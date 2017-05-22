@@ -13,9 +13,11 @@ Highlighter::Highlighter(QTextDocument *parent)
                     << "\\bpublic\\b" << "\\bstatic\\b" << "\\bstock\\b"
                     << "\\bassert\\b" << "\\bbreak\\b" << "\\bcase\\b"
                     << "\\bcontinue\\b" << "\\bdefault\\b" << "\\belse\\b"
-                    << "\\bexit\\b" << "\\for\\b" << "\\bgoto\\b"
+                    << "\\bexit\\b" << "\\bfor\\b" << "\\bgoto\\b"
                     << "\\bif\\b" << "\\breturn\\b" << "\\bsleep\\b"
-                    << "\\bstate\\b" << "\\bswitch\\b" << "\\bwhile\\b";
+                    << "\\bstate\\b" << "\\bswitch\\b" << "\\bwhile\\b"
+                    << "\\btrue\\b" << "\\bfalse\\b" << "\\bnull\\b"
+                    << "\\bbool\\b" << "\\bFloat\\b";
 
     foreach (const QString &pattern, keywordPatterns)
     {
@@ -26,8 +28,24 @@ Highlighter::Highlighter(QTextDocument *parent)
 
     classFormat.setFontWeight(QFont::Bold);
     classFormat.setForeground(Qt::darkMagenta);
-    rule.pattern = QRegExp("\\bQ[A-Za-z]+\\b");
+
+    rule.pattern = QRegExp("\\b[0-9]+\\b");
     rule.format = classFormat;
+    highlightingRules.append(rule);
+
+    doubleQuotationFormat.setForeground(Qt::blue);
+    rule.pattern = QRegExp("\".*\"");
+    rule.format = doubleQuotationFormat;
+    highlightingRules.append(rule);
+
+    singleQuotationFormat.setForeground(Qt::blue);
+    rule.pattern = QRegExp("\'.*\'");
+    rule.format = singleQuotationFormat;
+    highlightingRules.append(rule);
+
+    doubleQuotationFormat.setForeground(Qt::blue);
+    rule.pattern = QRegExp("<.*>");
+    rule.format = doubleQuotationFormat;
     highlightingRules.append(rule);
 
     singleLineCommentFormat.setForeground(Qt::darkGreen);
@@ -37,23 +55,10 @@ Highlighter::Highlighter(QTextDocument *parent)
 
     multiLineCommentFormat.setForeground(Qt::darkGreen);
 
-    doubleQuotationFormat.setForeground(Qt::blue);
-    rule.pattern = QRegExp("\".*\"");
-    rule.format = doubleQuotationFormat;
-    highlightingRules.append(rule);
 
-    doubleQuotationFormat.setForeground(Qt::blue);
-    rule.pattern = QRegExp("<.*>");
-    rule.format = doubleQuotationFormat;
-    highlightingRules.append(rule);
-
-    singleQuotationFormat.setForeground(Qt::blue);
-    rule.pattern = QRegExp("\'.*\'");
-    rule.format = singleQuotationFormat;
-    highlightingRules.append(rule);
 
     functionFormat.setFontItalic(true);
-    functionFormat.setForeground(Qt::blue);
+    functionFormat.setForeground(Qt::darkCyan);
     rule.pattern = QRegExp("\\b[A-Za-z0-9_]+(?=\\()");
     rule.format = functionFormat;
     highlightingRules.append(rule);
