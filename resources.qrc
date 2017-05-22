@@ -1,0 +1,9 @@
+<!DOCTYPE RCC>
+<RCC version="1.0">
+<qresource>
+    <file>Assets/NewFile.svg</file>
+    <file>Assets/OpenFile.svg</file>
+    <file>Assets/SaveFile.svg</file>
+    <file>Assets/Terminal.svg</file>
+</qresource>
+</RCC>
