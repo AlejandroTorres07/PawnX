@@ -17,7 +17,12 @@ Highlighter::Highlighter(QTextDocument *parent)
                     << "\\bif\\b" << "\\breturn\\b" << "\\bsleep\\b"
                     << "\\bstate\\b" << "\\bswitch\\b" << "\\bwhile\\b"
                     << "\\btrue\\b" << "\\bfalse\\b" << "\\bnull\\b"
-                    << "\\bbool\\b" << "\\bFloat\\b";
+                    << "\\bbool\\b" << "\\bFloat\\b" << "\\bdefine\\b"
+                    << "\\belseif\\b" << "\\bemit\\b" << "\\bendif\\b"
+                    << "\\bendinput\\b" << "\\bendscript\\b" << "\\berror\\b"
+                    << "\\binclude\\b" << "\\bpragma\\b" << "\\btryinclude\\b"
+                    << "\\bundef\\b" << "\\bifdef\\b" << "\\bifndef\\b"
+                    << "\\bdefined\\b";
 
     foreach (const QString &pattern, keywordPatterns)
     {
