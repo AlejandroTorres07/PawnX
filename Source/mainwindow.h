@@ -34,16 +34,26 @@ private:
     QAction *openAct;
     QAction *saveAct;
     QAction *saveAsAct;
+#ifndef Q_OS_MAC
+    QAction *exitAct;
+#endif
 
     Highlighter *highlighter;
 
     QString currentFile;
+    QString currentFilePath;
+    int fileChanged;
+
+protected:
+    void closeEvent(QCloseEvent *event) override;
 
 private slots:
     void NewFile();
     void OpenFile();
-    void Save();
+    int Save();
     void SaveAs();
+    void Exit();
+    bool ExitConfirm();
     /*void Undo();
     void Redo();
     void Cut();
@@ -52,6 +62,8 @@ private slots:
 
     void on_actionNewFile_triggered();
     void on_actionSaveFile_triggered();
+    void on_textEdit_textChanged();
+    void on_actionOpenFile_triggered();
 };
 
 #endif // MAINWINDOW_H

@@ -57,6 +57,13 @@ void MainWindow::CreateActions()
     saveAsAct->setShortcuts(QKeySequence::SaveAs);
     saveAsAct->setStatusTip(tr("Save current script"));
     connect(saveAsAct, &QAction::triggered, this, &MainWindow::SaveAs);
+
+#ifndef Q_OS_MAC
+    exitAct = new QAction(tr("&Close"), this);
+    exitAct->setShortcuts(QKeySequence::Close);
+    exitAct->setStatusTip(tr("Exit PawnX"));
+    connect(exitAct, &QAction::triggered, this, &MainWindow::Exit);
+#endif
 }
 
 void MainWindow::CreateMenus()
@@ -66,6 +73,10 @@ void MainWindow::CreateMenus()
     fileMenu->addAction(openAct);
     fileMenu->addAction(saveAct);
     fileMenu->addAction(saveAsAct);
+#ifndef Q_OS_MAC
+    fileMenu->addSeparator();
+    fileMenu->addAction(exitAct);
+#endif
 }
 
 void MainWindow::NewFile()
@@ -79,6 +90,7 @@ void MainWindow::NewFile()
     else statusMessage = tr("Created a new script");
     MainWindow::setWindowTitle("Untitled - PawnX");
     statusBar()->showMessage(statusMessage);
+    fileChanged = 0;
 }
 
 void MainWindow::OpenFile()
@@ -112,8 +124,49 @@ void MainWindow::OpenFile()
     statusBar()->showMessage(statusMessage);
 }
 
-void MainWindow::Save()
+int MainWindow::Save()
 {
+    if(currentFilePath.isEmpty())
+    {
+        SaveAs();
+        return 0;
+    }
+
+    QFile file(currentFilePath);
+    QFileInfo fileInfo(currentFilePath);
+
+    if (!file.open(QIODevice::WriteOnly))
+    {
+        QMessageBox::information(this, tr("Unable to open file"),
+            file.errorString());
+        statusMessage = tr("Saved file");
+    }
+    else
+    {
+
+        QTextStream outputStream(&file);
+        QString code = ui->textEdit->toPlainText();
+
+        currentFile = fileInfo.completeBaseName();
+        currentFilePath = fileInfo.absoluteFilePath();
+
+        MainWindow::setWindowTitle(currentFile + " - PawnX");
+
+        outputStream << code;
+        file.close();
+
+        statusMessage = tr("Saved file");
+    }
+
+    statusMessage = tr("Saved file");
+    statusBar()->showMessage(statusMessage);
+    fileChanged = 0;
+    return 0;
+}
+
+void MainWindow::SaveAs()
+{
+
     QString fileName = QFileDialog::getSaveFileName(this, tr("Save File"), QString(),
                                 tr("Pawn File (*.pwn *.p *.pawn);;Text Files (*.txt);;All types (*.*)"));
 
@@ -124,6 +177,7 @@ void MainWindow::Save()
     else
     {
         QFile file(fileName);
+        QFileInfo fileInfo(fileName);
         if (!file.open(QIODevice::WriteOnly))
         {
             QMessageBox::information(this, tr("Unable to open file"),
@@ -135,21 +189,59 @@ void MainWindow::Save()
 
             QTextStream outputStream(&file);
             QString code = ui->textEdit->toPlainText();
+
+            currentFile = fileInfo.completeBaseName();
+            currentFilePath = fileInfo.absoluteFilePath();
+
+            MainWindow::setWindowTitle(currentFile + " - PawnX");
+
             outputStream << code;
             file.close();
 
             statusMessage = tr("Saved file");
         }
     }
-
-
+    fileChanged = 0;
     statusBar()->showMessage(statusMessage);
 }
 
-void MainWindow::SaveAs()
+void MainWindow::Exit()
 {
-    statusMessage = tr("Saved file");
-    statusBar()->showMessage(statusMessage);
+    QApplication::quit();
+}
+
+void MainWindow::closeEvent(QCloseEvent *event)
+{
+    ExitConfirm();
+}
+
+void MainWindow::ExitConfirm()
+{
+    if (!ui->textEdit->document()->isModified())
+    {
+            Exit();
+    }
+    else
+    {
+        const QMessageBox::StandardButton ret
+            = QMessageBox::warning(this, tr("Application"),
+                                   tr("The document has been modified.\n"
+                                      "Do you want to save your changes?"),
+                                   QMessageBox::Save | QMessageBox::Discard | QMessageBox::Cancel);
+        switch (ret)
+        {
+            case QMessageBox::Save:
+                Save();
+                break;
+            case QMessageBox::Cancel:
+                //Cancel Exit
+                break;
+            default:
+                Exit();
+                break;
+        }
+
+    }
 }
 
 MainWindow::~MainWindow()
@@ -165,4 +257,14 @@ void MainWindow::on_actionNewFile_triggered()
 void MainWindow::on_actionSaveFile_triggered()
 {
     Save();
+}
+
+void MainWindow::on_textEdit_textChanged()
+{
+    fileChanged = 1;
+}
+
+void MainWindow::on_actionOpenFile_triggered()
+{
+    OpenFile();
 }
